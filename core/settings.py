@@ -27,7 +27,7 @@ CORS_ALLOWS_CREDENTIALS = True
 
 # Application definition
 INSTALLED_APPS = [
-    # "jazzmin",
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
