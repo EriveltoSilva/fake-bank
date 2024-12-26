@@ -16,9 +16,9 @@ DEBUG: bool = os.environ.get("DEBUG") == "1"
 ALLOWED_HOSTS: list[str] = ["127.0.0.1", "localhost", "46.202.134.73"]
 
 if not DEBUG:
-    CSRF_TRUSTED_ORIGINS = ["*"]
-    CSRF_ALLOWED_ORIGINS = ["*"]
-    CORS_ORIGINS_WHITELIST = ["*"]
+    CSRF_TRUSTED_ORIGINS = ["http://46.202.134.73"]
+    CSRF_ALLOWED_ORIGINS = ["http://46.202.134.73"]
+    CORS_ORIGINS_WHITELIST = ["http://46.202.134.73"]
     CSRF_COOKIE_SECURE = True
 
 CORS_ALLOW_ALL_ORIGINS = True
