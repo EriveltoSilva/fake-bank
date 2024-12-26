@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from apps.accounts.serializers import UserSerializer
+from apps.accounts.serializers import ProfileSerializer, UserSerializer
 
 from .models import Account, TransferLog
 
@@ -11,15 +11,34 @@ class AccountSerializer(serializers.ModelSerializer):
     """Serializer for Account objects"""
 
     user = UserSerializer()
+    profile = ProfileSerializer(write_only=True)
 
     class Meta:
         model = Account
-        fields = ["id", "user", "account_number", "balance", "account_type", "created_at"]
-        read_only_fields = ["id", "account_number", "created_at", "user"]
+        fields = ["id", "account_number", "balance", "account_type", "created_at", "user", "profile"]
+        read_only_fields = [
+            "id",
+            "account_number",
+            "created_at",
+            "user",
+        ]
+        write_only_fields = ["profile"]
 
     def create(self, validated_data):
+        # Extraindo dados do usuário
         user_data = validated_data.pop("user")
+        profile_data = validated_data.pop("profile")
+
+        # Criando o usuário
         user = UserSerializer().create(user_data)
+        profile = user.profile
+        profile.birthday = profile_data.get("birthday")
+        profile.gender = profile_data.get("gender")
+        profile.country = profile_data.get("country")
+        profile.state = profile_data.get("state")
+        profile.city = profile_data.get("city")
+        profile.address = profile_data.get("address")
+        profile.save()
         return Account.objects.create(user=user, **validated_data)
 
 
