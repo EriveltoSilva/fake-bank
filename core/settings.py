@@ -13,7 +13,7 @@ load_dotenv()
 
 SECRET_KEY: str = os.environ.get("SECRET_KEY", "INSECURE")
 DEBUG: bool = os.environ.get("DEBUG") == "1"
-ALLOWED_HOSTS: list[str] = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS: list[str] = ["127.0.0.1", "localhost", "46.202.134.73"]
 
 if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ["*"]
