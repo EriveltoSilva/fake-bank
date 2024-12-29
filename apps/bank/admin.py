@@ -9,7 +9,7 @@ from .models import Account, TransferLog
 class AccountAdmin(admin.ModelAdmin):
     """Bank account admin configuration"""
 
-    list_display = ("account_number", "user", "account_type", "balance", "created_at")
+    list_display = ("account_number", "iban", "user", "account_type", "balance", "created_at")
     list_filter = ("account_type", "created_at")
     search_fields = ("account_number", "user__username", "user__email")
     ordering = ("-created_at",)
