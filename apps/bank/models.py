@@ -20,7 +20,7 @@ class Account(models.Model):
     aid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="accounts")
     account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPES)
-    account_number = models.PositiveIntegerField(unique=True)
+    account_number = models.PositiveBigIntegerField(unique=True)
     iban = models.CharField(max_length=25, unique=True)
     balance = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
