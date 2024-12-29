@@ -237,3 +237,45 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+
+if not DEBUG:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "verbose": {
+                "format": "{levelname} ({levelno}) | {asctime} | {message} | {module} | {name} | {filename}:{lineno} | {funcName} | {stack_info} | {exc_info}",
+                "style": "{",
+            },
+            "simple": {
+                "format": "{levelname} {message}",
+                "style": "{",
+            },
+        },
+        "handlers": {
+            "file": {
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+                "class": "logging.FileHandler",
+                "filename": os.path.join(BASE_DIR, "debug.log"),
+                "formatter": "verbose",
+            },
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["file"],
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+                "propagate": True,
+            },
+            "django.request": {
+                "handlers": ["file"],
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+                "propagate": False,
+            },
+            "django.server": {
+                "handlers": ["file"],
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+                "propagate": False,
+            },
+        },
+    }
