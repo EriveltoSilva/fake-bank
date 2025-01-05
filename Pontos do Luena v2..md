@@ -1,6 +1,10 @@
 # Pontos do Luena v2.
 
 
+- Bloquear todas as rotas importantes
+- Pegar detalhes da conta pelo user autenticado
+
+
 ## **Gestão de Contas**
 1. **abrir_conta_corrente**
    - Abertura de conta corrente, coleta de informações pessoais e validação de documentos.

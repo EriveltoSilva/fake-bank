@@ -7,12 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Account, TransferLog
-from .serializers import (
-    AccountSerializer,
-    ConsultTransferSerializer,
-    TransferByAccountNumberSerializer,
-    TransferByIBANSerializer,
-)
+from .serializers import AccountSerializer, ConsultTransferSerializer, TransferByIBANSerializer
 
 
 class AccountCreateView(generics.CreateAPIView):
@@ -28,50 +23,44 @@ class AccountDetailView(generics.RetrieveAPIView):
 
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        account_number = self.kwargs.get("account_number", None)
+        user = self.request.user
+        try:
+            return Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            raise Http404("Account not found")
+
+
+class AccountDetailByIBANView(generics.RetrieveAPIView):
+    """Retrieve a specific account"""
+
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
         iban = self.kwargs.get("iban", None)
-        if not account_number and not iban:
-            raise Http404("Account number or iban not provided")
-        if account_number:
-            try:
-                return Account.objects.get(account_number=account_number)
-            except Account.DoesNotExist:
-                raise Http404("Account not found")
-        else:
+        if not iban:
+            raise Http404("Account iban not provided")
+        if iban:
             try:
                 return Account.objects.get(iban=iban)
             except Account.DoesNotExist:
                 raise Http404("Account not found")
-
-
-class TransferByAccountNumberView(APIView):
-    """Transfer money between accounts"""
-
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        """Perform the transfer"""
-        serializer = TransferByAccountNumberSerializer(data=request.data)
-        if serializer.is_valid():
-            transfer_data = serializer.save()
-            return Response(
-                {"message": "Transferência realizada com sucesso!", "transfer_details": transfer_data},
-                status=status.HTTP_200_OK,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise Http404("Account iban not provided")
 
 
 class TransferByIBANView(APIView):
     """Transfer money between accounts"""
 
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         """Perform the transfer"""
-        serializer = TransferByIBANSerializer(data=request.data)
+        serializer = TransferByIBANSerializer(data=request.data, context={"user": self.request.user})
         if serializer.is_valid():
             transfer_data = serializer.save()
             return Response(
@@ -81,13 +70,12 @@ class TransferByIBANView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ConsultTransactionByAccountNumberView(generics.ListAPIView):
+class ConsultTransactionView(generics.ListAPIView):
     """List all transactions for a specific account based on account_number"""
 
     serializer_class = ConsultTransferSerializer
-    permission_classes = [permissions.AllowAny]  # Adjust permissions as needed
+    permission_classes = [permissions.IsAuthenticated]  # Adjust permissions as needed
 
     def get_queryset(self):
-        account_number = self.kwargs.get("account_number")
-        account = get_object_or_404(Account, account_number=account_number)
+        account = get_object_or_404(Account, user=self.request.user)
         return TransferLog.objects.filter(sender_account=account) | TransferLog.objects.filter(receiver_account=account)

@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -114,6 +115,11 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "password": {"write_only": True},
         }
+
+    def create(self, validated_data):
+        validated_data["full_name"] = validated_data.get("full_name").upper()
+        validated_data["password"] = make_password(validated_data.get("password"))
+        return super().create(validated_data)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
